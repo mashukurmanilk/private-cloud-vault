@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  vault:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: private-cloud-vault
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:/app/prisma/vault.db
+      - JWT_SECRET=change-this-to-a-very-long-secret-key-in-production
+      - STORAGE_DIR=/app/uploads
+      - PORT=3000
+      - NODE_ENV=production
+    volumes:
+      - vault_data:/app/prisma
+      - vault_uploads:/app/uploads
+
+volumes:
+  vault_data:
+  vault_uploads:

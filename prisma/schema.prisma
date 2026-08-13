@@ -1,0 +1,64 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  pinCode      String?
+  items        Item[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Item {
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         String      // 'FILE' | 'VIDEO' | 'LINK' | 'NOTE'
+  title        String
+  description  String?
+  filename     String?     // saved path or filename in storage
+  originalName String?
+  mimeType     String?
+  size         Int?        // in bytes
+  url          String?     // for LINK
+  favicon      String?     // for LINK
+  content      String?     // for NOTE (Markdown / text)
+  isPinned     Boolean     @default(false)
+  isFavorite   Boolean     @default(false)
+  tags         String?     // comma-separated tags or JSON
+  category     String?     // e.g. "Work", "Personal", "Media"
+  meta         String?     // JSON metadata string
+  shares       ShareLink[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([userId, type])
+  @@index([isFavorite])
+  @@index([isPinned])
+}
+
+model ShareLink {
+  id           String    @id @default(cuid())
+  itemId       String
+  item         Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  token        String    @unique
+  passwordHash String?
+  expiresAt    DateTime?
+  downloads    Int       @default(0)
+  createdAt    DateTime  @default(now())
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
