@@ -30,11 +30,16 @@ You can run the vault on your main computer and immediately access it from any p
 Cloudflare Tunnel lets you access your local vault securely from anywhere in the world (even outside your home Wi-Fi) without opening ports on your router:
 
 1. Download and install `cloudflared`:
-   ```bash
-   # On Linux / Debian:
-   curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-   sudo dpkg -i cloudflared.deb
-   ```
+   - **On Windows**: Open PowerShell and run:
+     ```powershell
+     winget install --id Cloudflare.cloudflared
+     ```
+   - **On Mac**: `brew install cloudflare/cloudflare/cloudflared`
+   - **On Linux**: 
+     ```bash
+     curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+     sudo dpkg -i cloudflared.deb
+     ```
 2. Start an instant quick tunnel to your vault:
    ```bash
    cloudflared tunnel --url http://localhost:3000
@@ -46,6 +51,13 @@ Cloudflare Tunnel lets you access your local vault securely from anywhere in the
 ## ☁️ Option 3: 1-Click Cloud Hosting (Railway / Render / Fly.io)
 
 For 24/7 always-on hosting in the cloud:
+
+### Deploy to Vercel (Requires Cloud DB & Storage)
+**Important Note:** Vercel uses a serverless architecture with a read-only, ephemeral file system. If you deploy this project as-is on Vercel, your local SQLite database and uploaded files will reset randomly.
+To deploy to Vercel properly, you must:
+1. Switch to a Cloud Database (like Supabase or Neon PostgreSQL) in `prisma/schema.prisma`.
+2. Modify `src/lib/storage.ts` to upload files to cloud storage like AWS S3, Cloudflare R2, or Firebase.
+3. After those changes, you can link your GitHub repository to Vercel and it will deploy perfectly!
 
 ### Deploy to Railway
 1. Push this project to your GitHub repository.
